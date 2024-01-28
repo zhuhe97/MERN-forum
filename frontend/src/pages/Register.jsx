@@ -19,49 +19,99 @@ const Register = () => {
 				email,
 				password,
 			});
-			setLoading(false);
 			navigate('/login');
 		} catch (error) {
 			console.error('Registration failed:', error);
+		} finally {
 			setLoading(false);
 		}
 	};
 
+	// Reuse the styles from the Login component
+	const cardStyle = {
+		maxWidth: '400px',
+		margin: '40px auto',
+		padding: '20px',
+		boxShadow: '0 4px 8px 0 rgba(0,0,0,0.1)',
+		borderRadius: '10px',
+		display: 'flex',
+		flexDirection: 'column',
+		gap: '15px',
+		backgroundColor: 'white',
+	};
+
+	const labelStyle = {
+		display: 'block',
+		marginBottom: '5px',
+		fontWeight: '500',
+	};
+
+	const inputStyle = {
+		padding: '10px',
+		borderRadius: '5px',
+		border: '1px solid #ccc',
+		marginBottom: '10px', // Add some space below the input
+	};
+
+	const buttonStyle = {
+		padding: '10px 20px',
+		borderRadius: '5px',
+		border: 'none',
+		backgroundColor: '#007bff',
+		color: 'white',
+		cursor: 'pointer',
+		fontWeight: '500',
+		marginTop: '10px', // Add some space above the button
+	};
+
+	// JSX for the register form
 	return (
-		<form onSubmit={handleSubmit}>
-			<h2>Register</h2>
-			{/* Username Field */}
-			<label htmlFor='username'>Username:</label>
-			<input
-				type='text'
-				id='username'
-				value={username}
-				onChange={e => setUsername(e.target.value)}
-				required
-			/>
-			{/* Email Field */}
-			<label htmlFor='email'>Email:</label>
-			<input
-				type='email'
-				id='email'
-				value={email}
-				onChange={e => setEmail(e.target.value)}
-				required
-			/>
-			{/* Password Field */}
-			<label htmlFor='password'>Password:</label>
-			<input
-				type='password'
-				id='password'
-				value={password}
-				onChange={e => setPassword(e.target.value)}
-				required
-			/>
-			{/* Submit Button */}
-			<button type='submit' disabled={loading}>
-				{loading ? 'Registering...' : 'Register'}
-			</button>
-		</form>
+		<div style={cardStyle}>
+			<h2 style={{ textAlign: 'center', fontWeight: '600', fontSize: '24px' }}>
+				Register
+			</h2>
+			<form
+				onSubmit={handleSubmit}
+				style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+			>
+				<label htmlFor='username' style={labelStyle}>
+					Username:
+				</label>
+				<input
+					type='text'
+					id='username'
+					value={username}
+					onChange={e => setUsername(e.target.value)}
+					required
+					style={inputStyle}
+				/>
+				<label htmlFor='email' style={labelStyle}>
+					Email:
+				</label>
+				<input
+					type='email'
+					id='email'
+					value={email}
+					onChange={e => setEmail(e.target.value)}
+					required
+					style={inputStyle}
+				/>
+				<label htmlFor='password' style={labelStyle}>
+					Password:
+				</label>
+				<input
+					type='password'
+					id='password'
+					value={password}
+					onChange={e => setPassword(e.target.value)}
+					required
+					style={inputStyle}
+				/>
+				<button type='submit' disabled={loading} style={buttonStyle}>
+					{loading ? 'Registering...' : 'Register'}
+				</button>
+			</form>
+		</div>
 	);
 };
 

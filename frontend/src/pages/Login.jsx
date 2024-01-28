@@ -23,40 +23,105 @@ const Login = ({ onLogin }) => {
 			});
 			onLogin(response.data);
 			navigate('/');
-			setLoading(false);
 		} catch (error) {
 			console.error('Login failed:', error);
+		} finally {
 			setLoading(false);
 		}
 	};
 
-	return (
-		<form onSubmit={handleSubmit}>
-			<h2>Login</h2>
-			<label htmlFor='email'>Email:</label>
-			<input
-				type='email'
-				id='email'
-				value={email}
-				onChange={e => setEmail(e.target.value)}
-				required
-			/>
-			<label htmlFor='password'>Password:</label>
-			<input
-				type='password'
-				id='password'
-				value={password}
-				onChange={e => setPassword(e.target.value)}
-				required
-			/>
-			<button type='submit' disabled={loading}>
-				{loading ? 'Logging in...' : 'Login'}
-			</button>
+	const cardStyle = {
+		maxWidth: '400px',
+		margin: '40px auto',
+		padding: '20px',
+		boxShadow: '0 4px 8px 0 rgba(0,0,0,0.1)',
+		borderRadius: '10px',
+		display: 'flex',
+		flexDirection: 'column',
+		gap: '15px',
+		backgroundColor: 'white',
+	};
 
-			<button type='button' onClick={handleGoToRegister}>
-				Register
-			</button>
-		</form>
+	const labelStyle = {
+		display: 'block',
+		marginBottom: '5px',
+		fontWeight: '500',
+	};
+
+	const inputStyle = {
+		padding: '10px',
+		borderRadius: '5px',
+		border: '1px solid #ccc',
+		marginBottom: '10px',
+	};
+
+	const buttonStyle = {
+		padding: '10px 20px',
+		borderRadius: '5px',
+		border: 'none',
+		backgroundColor: '#007bff',
+		color: 'white',
+		cursor: 'pointer',
+		fontWeight: '500',
+	};
+
+	const buttonSecondaryStyle = {
+		...buttonStyle,
+		backgroundColor: '#6c757d',
+	};
+
+	const hoverEffect = {
+		':hover': {
+			opacity: 0.8,
+		},
+	};
+
+	Object.assign(buttonStyle, hoverEffect);
+	Object.assign(buttonSecondaryStyle, hoverEffect);
+
+	return (
+		<div style={cardStyle}>
+			<h2 style={{ textAlign: 'center', fontWeight: '600', fontSize: '24px' }}>
+				Login
+			</h2>
+			<form
+				onSubmit={handleSubmit}
+				style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+			>
+				<label htmlFor='email' style={labelStyle}>
+					Email:
+				</label>
+				<input
+					type='email'
+					id='email'
+					value={email}
+					onChange={e => setEmail(e.target.value)}
+					required
+					style={inputStyle}
+				/>
+				<label htmlFor='password' style={labelStyle}>
+					Password:
+				</label>
+				<input
+					type='password'
+					id='password'
+					value={password}
+					onChange={e => setPassword(e.target.value)}
+					required
+					style={inputStyle}
+				/>
+				<button type='submit' disabled={loading} style={buttonStyle}>
+					{loading ? 'Logging in...' : 'Login'}
+				</button>
+				<button
+					type='button'
+					onClick={handleGoToRegister}
+					style={buttonSecondaryStyle}
+				>
+					Register
+				</button>
+			</form>
+		</div>
 	);
 };
 
