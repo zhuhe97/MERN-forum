@@ -3,7 +3,7 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineDelete } from 'react-icons/md';
 
-function PostsTable({ posts }) {
+function PostsTable({ posts, currentUser }) {
 	// Function to truncate post content
 	const truncateContent = (content, charLimit = 100) => {
 		if (typeof content !== 'string') {
@@ -44,12 +44,17 @@ function PostsTable({ posts }) {
 								<Link to={`/posts/details/${post._id}`}>
 									<BsInfoCircle className='text-2xl text-green-800' />
 								</Link>
-								<Link to={`/posts/edit/${post._id}`}>
-									<AiOutlineEdit className='text-2xl text-yellow-600' />
-								</Link>
-								<Link to={`/posts/delete/${post._id}`}>
-									<MdOutlineDelete className='text-2xl text-red-600' />
-								</Link>
+								{/* Render Edit and Delete buttons only if currentUser is the creator of the post */}
+								{currentUser && currentUser.id === post.user && (
+									<>
+										<Link to={`/posts/edit/${post._id}`}>
+											<AiOutlineEdit className='text-2xl text-yellow-600' />
+										</Link>
+										<Link to={`/posts/delete/${post._id}`}>
+											<MdOutlineDelete className='text-2xl text-red-600' />
+										</Link>
+									</>
+								)}
 							</div>
 						</td>
 					</tr>
