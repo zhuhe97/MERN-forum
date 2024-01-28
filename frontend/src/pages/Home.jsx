@@ -5,15 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { MdOutlineAddBox } from 'react-icons/md';
 import PostsCard from '../components/home/PostsCard';
 import PostsTable from '../components/home/PostsTable';
-import Navigation from '../components/Navigation';
 import { useAuth } from '../utils/auth';
+import Header from '../components/Header';
 
 const Home = () => {
 	const [posts, setPosts] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [showType, setShowType] = useState('table');
+	const [currentUser, setCurrentUser] = useState(null);
 
-	const { validateTokenAndRedirect } = useAuth();
+	const { validateTokenAndRedirect, getUser } = useAuth();
 	const navigate = useNavigate();
 
 	const handleCreatePostClick = () => {
@@ -29,6 +30,7 @@ const Home = () => {
 
 	useEffect(() => {
 		setLoading(true);
+		setCurrentUser(getUser());
 		axios
 			.get('http://localhost:5555/posts')
 			.then(response => {
@@ -39,11 +41,11 @@ const Home = () => {
 				console.log(error);
 				setLoading(false);
 			});
-	}, []);
+	}, [getUser]);
 
 	return (
 		<div>
-			<Navigation />
+			<Header />
 			<div className='p-4'>
 				<div className='flex justify-center items-center gap-x-4'>
 					<button
@@ -76,9 +78,9 @@ const Home = () => {
 				{loading ? (
 					<Spinner />
 				) : showType === 'table' ? (
-					<PostsTable posts={posts} />
+					<PostsTable posts={posts} currentUser={currentUser} />
 				) : (
-					<PostsCard posts={posts} />
+					<PostsCard posts={posts} currentUser={currentUser} />
 				)}
 			</div>
 		</div>
