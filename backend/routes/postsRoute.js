@@ -4,6 +4,7 @@ import { User } from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config.js';
 import bcrypt from 'bcryptjs';
+import commentRoutes from './commentsRoutes.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import {
 	createPost,
@@ -58,6 +59,7 @@ router.post('/', protect, createPost);
 // });
 router.get('/', getAllPosts);
 
+router.use('/', commentRoutes);
 // router.get('/:id', async (request, response) => {
 // 	try {
 // 		const { id } = request.params;

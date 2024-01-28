@@ -1,13 +1,15 @@
 import express from 'express';
 import {
+	getCommentsForPost,
 	createComment,
 	deleteComment,
 } from '../controllers/commentController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
-router.post('/', protect, createComment);
-router.delete('/:id', protect, deleteComment);
+router.get('/:postId/comments', getCommentsForPost);
+router.post('/:postId/comments', protect, createComment);
+router.delete('/:commentId', protect, deleteComment);
 
 export default router;

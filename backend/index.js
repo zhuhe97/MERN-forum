@@ -30,7 +30,7 @@ app.get('/', (request, response) => {
 
 app.use('/posts', postsRoute);
 app.use('/users', userRoutes);
-app.use('/comments', commentRoutes);
+// app.use('/comments', commentRoutes);
 
 // app.post('/posts', async (request, response) => {
 // 	try {

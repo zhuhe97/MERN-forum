@@ -1,5 +1,13 @@
 import { Comment } from '../models/commentModel.js';
 
+export const getCommentsForPost = async postId => {
+	const comments = await Comment.find({ post: postId }).populate(
+		'user',
+		'username'
+	);
+	return comments;
+};
+
 export const createComment = async (commentData, user) => {
 	if (!commentData.content) {
 		const error = new Error('Comment content is required');
