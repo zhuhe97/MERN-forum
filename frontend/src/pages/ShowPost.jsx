@@ -3,13 +3,18 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
+import { MdDelete } from 'react-icons/md';
+import { useAuth } from '../utils/auth';
 
 const ShowPost = () => {
+	const { getUser } = useAuth();
+
 	const [post, setPost] = useState({});
 	const [comments, setComments] = useState([]);
 	const [newComment, setNewComment] = useState('');
 	const [loading, setLoading] = useState(false);
 	const { id } = useParams();
+	const currentUser = getUser();
 
 	useEffect(() => {
 		setLoading(true);
@@ -67,6 +72,23 @@ const ShowPost = () => {
 			});
 	};
 
+	const handleDeleteComment = commentId => {
+		const token = localStorage.getItem('token');
+		axios
+			.delete(`http://localhost:5555/posts/comments/${commentId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.then(() => {
+				// Remove the deleted comment from the state
+				setComments(comments.filter(comment => comment._id !== commentId));
+			})
+			.catch(error => {
+				console.error('Error deleting comment:', error);
+			});
+	};
+
 	// Function to convert date strings to a readable format
 	const formatDate = dateString => {
 		return new Date(dateString).toLocaleString();
@@ -120,8 +142,16 @@ const ShowPost = () => {
 									className='bg-gray-100 p-2 rounded-lg mb-2'
 								>
 									<p className='text-gray-600'>{comment.content}</p>
-									<div className='text-right text-sm text-gray-500'>
-										{formatDate(comment.createdAt)}
+									<div className='flex justify-between items-center'>
+										<div className='text-right text-sm text-gray-500'>
+											{formatDate(comment.createdAt)}
+										</div>
+										{currentUser && currentUser.id === comment.user._id && (
+											<MdDelete
+												className='text-2xl text-red-600 cursor-pointer'
+												onClick={() => handleDeleteComment(comment._id)}
+											/>
+										)}
 									</div>
 								</div>
 							))}
