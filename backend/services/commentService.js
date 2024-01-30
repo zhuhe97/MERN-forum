@@ -1,10 +1,79 @@
 import { Comment } from '../models/commentModel.js';
+import mongoose from 'mongoose';
+import { Like } from '../models/likeModel.js';
 
-export const getCommentsForPost = async postId => {
-	const comments = await Comment.find({ post: postId }).populate(
-		'user',
-		'username'
-	);
+export const getCommentsForPost = async (postId, userId) => {
+	const objectIdPostId = new mongoose.Types.ObjectId(postId);
+	const objectIdUserId = userId ? new mongoose.Types.ObjectId(userId) : null;
+
+	const comments = await Comment.aggregate([
+		{ $match: { post: objectIdPostId } },
+		{
+			$lookup: {
+				from: 'users',
+				localField: 'user',
+				foreignField: '_id',
+				as: 'user',
+			},
+		},
+		{ $unwind: '$user' },
+		{
+			$lookup: {
+				from: 'likes',
+				localField: '_id',
+				foreignField: 'comment',
+				as: 'likes',
+			},
+		},
+		{
+			$lookup: {
+				from: 'likes',
+				let: {
+					commentId: '$_id',
+					userId: objectIdUserId,
+				},
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{ $eq: ['$comment', '$$commentId'] },
+									objectIdUserId
+										? { $eq: ['$user', '$$userId'] }
+										: { $eq: [false, true] },
+								],
+							},
+						},
+					},
+				],
+				as: 'userLike',
+			},
+		},
+		{
+			$addFields: {
+				likeCount: { $size: '$likes' },
+				isLikedByCurrentUser: {
+					$cond: {
+						if: { $gt: [{ $size: '$userLike' }, 0] },
+						then: true,
+						else: false,
+					},
+				},
+			},
+		},
+		{
+			$project: {
+				content: 1,
+				post: 1,
+				user: { _id: 1, username: 1 },
+				createdAt: 1,
+				updatedAt: 1,
+				likeCount: 1,
+				isLikedByCurrentUser: 1,
+			},
+		},
+	]);
+
 	return comments;
 };
 

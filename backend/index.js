@@ -2,7 +2,7 @@ import express from 'express';
 import mongooes from 'mongoose';
 import postsRoute from './routes/postsRoute.js';
 import userRoutes from './routes/userRoutes.js';
-import commentRoutes from './routes/commentsRoutes.js';
+import likeRoute from './routes/likeRoute.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PORT, mongoDBURL } from './config.js';
@@ -30,7 +30,7 @@ app.get('/', (request, response) => {
 
 app.use('/posts', postsRoute);
 app.use('/users', userRoutes);
-// app.use('/comments', commentRoutes);
+app.use('/', likeRoute);
 
 // app.post('/posts', async (request, response) => {
 // 	try {
