@@ -5,6 +5,7 @@ import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
 import { MdDelete } from 'react-icons/md';
 import { useAuth } from '../utils/auth';
+import { FaThumbsUp } from 'react-icons/fa';
 
 const ShowPost = () => {
 	const { getUser } = useAuth();
@@ -89,6 +90,40 @@ const ShowPost = () => {
 			});
 	};
 
+	const handleToggleLike = commentId => {
+		const token = localStorage.getItem('token');
+		axios
+			.post(
+				`http://localhost:5555/toggleLike/${commentId}`,
+				{},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			)
+			.then(response => {
+				// Update the specific comment's like status and count
+				setComments(
+					comments.map(comment => {
+						if (comment._id === commentId) {
+							return {
+								...comment,
+								isLikedByCurrentUser: !comment.isLikedByCurrentUser, // Toggle the like status
+								likeCount: comment.isLikedByCurrentUser
+									? comment.likeCount - 1
+									: comment.likeCount + 1, // Update the like count
+							};
+						}
+						return comment;
+					})
+				);
+			})
+			.catch(error => {
+				console.error('Error toggling like:', error);
+			});
+	};
+
 	// Function to convert date strings to a readable format
 	const formatDate = dateString => {
 		return new Date(dateString).toLocaleString();
@@ -141,17 +176,42 @@ const ShowPost = () => {
 									key={comment._id}
 									className='bg-gray-100 p-2 rounded-lg mb-2'
 								>
-									<p className='text-gray-600'>{comment.content}</p>
-									<div className='flex justify-between items-center'>
-										<div className='text-right text-sm text-gray-500'>
-											{formatDate(comment.createdAt)}
+									<div className='flex justify-between'>
+										<div className='flex items-start space-x-4'>
+											<img
+												src='path_to_avatar_image_or_service'
+												alt='Avatar'
+												className='w-10 h-10 rounded-full'
+											/>{' '}
+											{/* Avatar Image */}
+											<div>
+												<div className='text-sm font-medium text-gray-700'>
+													{comment.user.username}
+												</div>{' '}
+												{/* Username */}
+												<p className='text-gray-600'>{comment.content}</p>
+											</div>
 										</div>
+										<div className='text-right text-sm text-gray-500 self-start'>
+											{formatDate(comment.createdAt)} {/* Date */}
+										</div>
+									</div>
+									<div className='flex justify-end mt-2'>
 										{currentUser && currentUser.id === comment.user._id && (
 											<MdDelete
-												className='text-2xl text-red-600 cursor-pointer'
+												className='text-2xl text-red-600 cursor-pointer mr-2'
 												onClick={() => handleDeleteComment(comment._id)}
 											/>
 										)}
+										<FaThumbsUp
+											className={`text-2xl cursor-pointer ${
+												comment.isLikedByCurrentUser
+													? 'text-blue-600'
+													: 'text-gray-400'
+											}`}
+											onClick={() => handleToggleLike(comment._id)}
+										/>
+										<span className='ml-2'>{comment.likeCount}</span>
 									</div>
 								</div>
 							))}
