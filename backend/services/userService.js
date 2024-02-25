@@ -51,4 +51,32 @@ export const loginUser = async (email, password) => {
 
 	return { user, token };
 };
-``;
+
+export const updateUserProfile = async ({ id, username, email, avatar }) => {
+	const user = await User.findById(id);
+
+	if (!user) {
+		const error = new Error('User not found');
+		error.statusCode = 404;
+		throw error;
+	}
+
+	user.username = username || user.username;
+	user.email = email || user.email;
+	user.avatar = avatar || user.avatar; // Add logic to handle avatar updates
+
+	await user.save();
+	return user;
+};
+
+export const updateUserAvatarUrl = async (userId, avatarUrl) => {
+	const user = await User.findById(userId);
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	user.avatar = avatarUrl; // Update the avatar URL
+	await user.save(); // Save the changes to the database
+
+	return user; // Return the updated user object
+};

@@ -6,6 +6,7 @@ import likeRoute from './routes/likeRoute.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PORT, mongoDBURL } from './config.js';
+import { admin, bucket } from './firebaseConfig.js';
 
 dotenv.config();
 
