@@ -31,6 +31,17 @@ export const loginUser = async (req, res) => {
 	}
 };
 
+export const getUserProfile = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const user = await userService.getUserById(userId);
+		res.json(user);
+	} catch (error) {
+		console.error('Failed to get user profile:', error);
+		res.status(500).send('Server error');
+	}
+};
+
 export const updateUserProfile = async (req, res) => {
 	try {
 		const userId = req.user.id;

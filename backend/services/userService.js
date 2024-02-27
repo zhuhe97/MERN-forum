@@ -52,6 +52,14 @@ export const loginUser = async (email, password) => {
 	return { user, token };
 };
 
+export const getUserById = async userId => {
+	const user = await User.findById(userId).select('-password'); // Exclude the password from the result
+	if (!user) {
+		throw new Error('User not found');
+	}
+	return user;
+};
+
 export const updateUserProfile = async ({ id, username, email, avatar }) => {
 	const user = await User.findById(id);
 
