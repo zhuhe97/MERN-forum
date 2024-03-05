@@ -6,32 +6,38 @@ const PostDetails = ({ post }) => {
 	};
 
 	return (
-		<div className='flex flex-col border-2 border-sky-400 rounded-xl w-full p-4'>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Id</span>
-				<span>{post._id}</span>
+		<article className='max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl'>
+			<div className='md:flex'>
+				<div className='p-8'>
+					<h1 className='block mt-1 text-4xl leading-tight font-extrabold text-gray-900 sm:mt-2 sm:text-5xl sm:leading-none sm:tracking-tight lg:mt-4 lg:text-6xl'>
+						{post.title}
+					</h1>
+					<div className='mt-2 text-gray-500'>
+						<div className='flex items-center mt-2'>
+							{/* <img
+								className='w-10 h-10 rounded-full mr-4'
+								src={author.avatar}
+								alt={`${author.name} avatar`}
+							/> */}
+							<div className='text-base leading-6 font-medium space-y-1'>
+								{/* <h3 className='text-gray-900'>{author.name}</h3> */}
+								<p className='text-gray-400 text-sm'>
+									Created at: {formatDate(post.createdAt)}{' '}
+									{post.createdAt !== post.updatedAt && (
+										<span className='text-gray-400 text-sm'>
+											| Updated at: {formatDate(post.updatedAt)}
+										</span>
+									)}
+								</p>
+							</div>
+						</div>
+						<div className='prose lg:prose-xl mt-4 text-gray-500'>
+							{post.content}
+						</div>
+					</div>
+				</div>
 			</div>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Title</span>
-				<span>{post.title}</span>
-			</div>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Content</span>
-				<span>{post.content}</span>
-			</div>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Create Time</span>
-				<span>{new Date(post.createdAt).toString()}</span>
-			</div>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Create Time</span>
-				<span>{formatDate(post.createdAt)}</span>
-			</div>
-			<div className='my-4'>
-				<span className='text-xl mr-4 text-grey-500'>Last Update Time</span>
-				<span>{new Date(post.updatedAt).toString()}</span>
-			</div>
-		</div>
+		</article>
 	);
 };
 

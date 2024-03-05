@@ -10,50 +10,63 @@ const CommentsSection = ({
 	currentUser,
 }) => {
 	return (
-		<div className='my-4'>
-			<h2 className='text-2xl mb-3'>Comments</h2>
-			{Array.isArray(comments) &&
-				comments.map(comment => (
-					<div key={comment._id} className='bg-gray-100 p-2 rounded-lg mb-2'>
-						<div className='flex justify-between'>
-							<div className='flex items-start space-x-4'>
-								<img
-									src='path_to_avatar_image_or_service'
-									alt='Avatar'
-									className='w-10 h-10 rounded-full'
-								/>{' '}
-								{/* Avatar Image */}
-								<div>
-									<div className='text-sm font-medium text-gray-700'>
-										{comment.user.username}
-									</div>{' '}
-									{/* Username */}
-									<p className='text-gray-600'>{comment.content}</p>
+		<div className='max-w-2xl mx-auto bg-white rounded-xl overflow-hidden md:max-w-3xl'>
+			<div className='my-8 px-6 py-4'>
+				<h2 className='text-2xl font-semibold mb-4 text-sea-green-500'>
+					Comments
+				</h2>
+				{Array.isArray(comments) &&
+					comments.map((comment, index) => (
+						<div
+							key={comment._id}
+							className={`p-4 ${
+								index < comments.length - 1 ? 'border-b border-gray-200' : ''
+							}`}
+						>
+							<div className='flex justify-between items-center'>
+								<div className='flex items-center space-x-4'>
+									<img
+										src={comment.user.avatar || 'default_avatar_path'}
+										alt='Avatar'
+										className='w-12 h-12 rounded-full'
+									/>
+									<div>
+										<div className='text-sm font-medium text-gray-800'>
+											{comment.user.username}
+										</div>
+										<p className='text-gray-500'>{comment.content}</p>
+									</div>
+								</div>
+								<div className='text-sm text-gray-400'>
+									{formatDate(comment.createdAt)}
 								</div>
 							</div>
-							<div className='text-right text-sm text-gray-500 self-start'>
-								{formatDate(comment.createdAt)} {/* Date */}
+							<div className='flex justify-end mt-2 space-x-2'>
+								{currentUser && currentUser.id === comment.user._id && (
+									<MdDelete
+										className='text-xl text-red-500 hover:text-red-600 cursor-pointer'
+										onClick={() => handleDeleteComment(comment._id)}
+										title='Delete comment'
+									/>
+								)}
+								<div className='flex items-center'>
+									<FaThumbsUp
+										className={`text-xl cursor-pointer ${
+											comment.isLikedByCurrentUser
+												? 'text-sea-green-500 hover:text-sea-green-600'
+												: 'text-gray-300 hover:text-gray-400'
+										}`}
+										onClick={() => handleToggleLike(comment._id)}
+										title='Like comment'
+									/>
+									<span className='text-sm font-medium text-gray-600 ml-2'>
+										{comment.likeCount}
+									</span>
+								</div>
 							</div>
 						</div>
-						<div className='flex justify-end mt-2'>
-							{currentUser && currentUser.id === comment.user._id && (
-								<MdDelete
-									className='text-2xl text-red-600 cursor-pointer mr-2'
-									onClick={() => handleDeleteComment(comment._id)}
-								/>
-							)}
-							<FaThumbsUp
-								className={`text-2xl cursor-pointer ${
-									comment.isLikedByCurrentUser
-										? 'text-blue-600'
-										: 'text-gray-400'
-								}`}
-								onClick={() => handleToggleLike(comment._id)}
-							/>
-							<span className='ml-2'>{comment.likeCount}</span>
-						</div>
-					</div>
-				))}
+					))}
+			</div>
 		</div>
 	);
 };

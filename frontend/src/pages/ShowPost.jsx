@@ -12,6 +12,7 @@ const ShowPost = () => {
 	const { getUser } = useAuth();
 
 	const [post, setPost] = useState({});
+	// const [user, setUser] = useState(null);
 	const [comments, setComments] = useState([]);
 	const [newComment, setNewComment] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ const ShowPost = () => {
 				console.log('Post data:', response.data);
 				setPost(response.data);
 				setLoading(false);
+				// return axios.get(`http://localhost:5555/users/${response.data.user}`);
 			})
 			.catch(error => {
 				console.log('Error fetching post:', error);
@@ -35,7 +37,7 @@ const ShowPost = () => {
 		axios
 			.get(`http://localhost:5555/posts/${id}/comments`)
 			.then(response => {
-				console.log('Post data:', response.data);
+				console.log('Comment data:', response.data);
 				setComments(response.data);
 			})
 			.catch(error => {
@@ -137,7 +139,6 @@ const ShowPost = () => {
 	return (
 		<div className='p-4'>
 			<BackButton />
-			<h1 className='text-3xl my-4'> Show Book</h1>
 			{loading ? (
 				<Spinner />
 			) : (
@@ -145,6 +146,13 @@ const ShowPost = () => {
 					{/* Post details ... */}
 					<PostDetails post={post} />
 
+					{/* Comment submission form */}
+					<CommentForm
+						newComment={newComment}
+						setNewComment={setNewComment}
+						handleCommentSubmit={handleCommentSubmit}
+						loading={loading}
+					/>
 					{/* Comments section */}
 					<CommentsSection
 						comments={comments}
@@ -152,14 +160,6 @@ const ShowPost = () => {
 						handleDeleteComment={handleDeleteComment}
 						handleToggleLike={handleToggleLike}
 						currentUser={currentUser}
-					/>
-
-					{/* Comment submission form */}
-					<CommentForm
-						newComment={newComment}
-						setNewComment={setNewComment}
-						handleCommentSubmit={handleCommentSubmit}
-						loading={loading}
 					/>
 				</>
 			)}
