@@ -7,6 +7,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { PORT, mongoDBURL } from './config.js';
 import { admin, bucket } from './firebaseConfig.js';
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 
 dotenv.config();
 
@@ -132,3 +133,7 @@ mongooes
 	.catch(error => {
 		console.log(error);
 	});
+
+// Error handling middleware
+app.use(notFound);
+app.use(errorHandler);
