@@ -6,6 +6,7 @@ import {
 	getUserProfile,
 	updateUserProfile,
 	updateUserAvatar,
+	getUserPosts,
 } from '../controllers/userController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 
@@ -15,12 +16,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/profile', protect, getUserProfile);
-router.put('/profile', protect, updateUserProfile);
-router.post(
-	'/profile/avatar',
-	protect,
-	upload.single('avatar'),
-	updateUserAvatar
-);
+router.patch('/profile', protect, updateUserProfile);
+// router.post(
+// 	'/profile/avatar',
+// 	protect,
+// 	upload.single('avatar'),
+// 	updateUserAvatar
+// );
+router.get('/my-posts', protect, getUserPosts);
 
 export default router;

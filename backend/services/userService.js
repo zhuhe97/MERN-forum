@@ -2,19 +2,28 @@ import { User } from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config.js';
+import { bucket } from '../firebaseConfig.js';
+import HttpError from '../models/errorModel.js';
 
-export const createUser = async ({ username, email, password }) => {
+export const createUser = async userData => {
+	const { username, email, password, password2 } = userData;
+
 	if (!username || !email || !password) {
-		const error = new Error('All fields are required');
-		error.statusCode = 400;
-		throw error;
+		throw new HttpError('All fields are required', 422);
 	}
 
-	const userExists = await User.findOne({ email });
+	const newEmail = email.toLowerCase();
+
+	const userExists = await User.findOne({ email: newEmail });
 	if (userExists) {
-		const error = new Error('User already exists');
-		error.statusCode = 400;
-		throw error;
+		throw new HttpError('User already exists', 422);
+	}
+	if (password.trim().length < 6) {
+		throw new HttpError('Password should be larger than 6', 422);
+	}
+
+	if (password != password2) {
+		throw new HttpError('Passwords do not match', 422);
 	}
 
 	const salt = await bcrypt.genSalt(10);
@@ -22,25 +31,22 @@ export const createUser = async ({ username, email, password }) => {
 
 	const user = await User.create({
 		username,
-		email,
+		email: newEmail,
 		password: hashedPassword,
 	});
-
-	if (!user) {
-		const error = new Error('Invalid user data');
-		error.statusCode = 400;
-		throw error;
-	}
 
 	return user;
 };
 
-export const loginUser = async (email, password) => {
-	const user = await User.findOne({ email });
+export const loginUser = async ({ email, password }) => {
+	if (!email || !password) {
+		throw new HttpError('All fields are required', 422);
+	}
+	const newEmail = email.toLowerCase();
+	const user = await User.findOne({ email: newEmail });
+
 	if (!user || !(await bcrypt.compare(password, user.password))) {
-		const error = new Error('Invalid email or password');
-		error.statusCode = 401;
-		throw error;
+		throw new HttpError('Invalid email or password', 401); // 401 for invalid credentials
 	}
 
 	const token = jwt.sign(
@@ -53,9 +59,10 @@ export const loginUser = async (email, password) => {
 };
 
 export const getUserById = async userId => {
-	const user = await User.findById(userId).select('-password'); // Exclude the password from the result
+	const user = await User.findById(userId).select('-password');
+
 	if (!user) {
-		throw new Error('User not found');
+		throw new HttpError('User not found', 404);
 	}
 	return user;
 };
@@ -64,27 +71,48 @@ export const updateUserProfile = async ({ id, username, email, avatar }) => {
 	const user = await User.findById(id);
 
 	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
+		throw new HttpError('User not found', 404);
 	}
 
-	user.username = username || user.username;
-	user.email = email || user.email;
-	user.avatar = avatar || user.avatar; // Add logic to handle avatar updates
+	if (email !== undefined && email.trim() === '') {
+		throw new HttpError('Email cannot be empty', 422);
+	}
+
+	if (username !== undefined) {
+		user.username = username.trim() !== '' ? username : user.username;
+	}
+
+	if (email && email !== user.email) {
+		const emailExists = await User.findOne({
+			email: email.trim().toLowerCase(),
+		});
+		if (emailExists) {
+			throw new HttpError('Email already in use', 400);
+		}
+		user.email = email.trim().toLowerCase();
+	}
+
+	if (avatar !== undefined) {
+		user.avatar = avatar;
+	}
 
 	await user.save();
-	return user;
+	return {
+		_id: user._id,
+		username: user.username,
+		email: user.email,
+		avatar: user.avatar,
+	};
 };
 
-export const updateUserAvatarUrl = async (userId, avatarUrl) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		throw new Error('User not found');
-	}
+// export const updateUserAvatarUrl = async (userId, avatarUrl) => {
+// 	const user = await User.findById(userId);
+// 	if (!user) {
+// 		throw new Error('User not found');
+// 	}
 
-	user.avatar = avatarUrl; // Update the avatar URL
-	await user.save(); // Save the changes to the database
+// 	user.avatar = avatarUrl; // Update the avatar URL
+// 	await user.save(); // Save the changes to the database
 
-	return user; // Return the updated user object
-};
+// 	return user; // Return the updated user object
+// };
