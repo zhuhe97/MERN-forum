@@ -5,7 +5,6 @@ import {
 	loginUser,
 	getUserProfile,
 	updateUserProfile,
-	updateUserAvatar,
 	getUserPosts,
 } from '../controllers/userController.js';
 import { protect } from '../middlewares/authMiddleware.js';
