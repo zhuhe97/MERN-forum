@@ -1,12 +1,12 @@
 import * as postService from '../services/postService.js';
 
-export const createPost = async (req, res) => {
+export const createPost = async (req, res, next) => {
 	try {
 		const post = await postService.createPost(req.body, req.user);
 		res.status(201).json(post);
 	} catch (error) {
 		console.error(error.message);
-		res.status(error.statusCode || 500).json({ message: error.message });
+		next(error);
 	}
 };
 
@@ -23,17 +23,17 @@ export const getAllPosts = async (req, res, next) => {
 	}
 };
 
-export const getPostById = async (req, res) => {
+export const getPostById = async (req, res, next) => {
 	try {
 		const post = await postService.findPostById(req.params.id);
 		res.status(200).json(post);
 	} catch (error) {
 		console.log(error.message);
-		res.status(500).json({ message: error.message });
+		return next(error);
 	}
 };
 
-export const updatePost = async (req, res) => {
+export const updatePost = async (req, res, next) => {
 	try {
 		const updatedPost = await postService.updatePostById(
 			req.params.id,
@@ -43,16 +43,16 @@ export const updatePost = async (req, res) => {
 		res.status(200).json(updatedPost);
 	} catch (error) {
 		console.log(error.message);
-		res.status(error.statusCode || 500).json({ message: error.message });
+		return next(error);
 	}
 };
 
-export const deletePost = async (req, res) => {
+export const deletePost = async (req, res, next) => {
 	try {
 		await postService.deletePostById(req.params.id, req.user);
 		res.status(200).json({ message: 'Post deleted successfully' });
 	} catch (error) {
 		console.log(error.message);
-		res.status(error.statusCode || 500).json({ message: error.message });
+		return next(error);
 	}
 };

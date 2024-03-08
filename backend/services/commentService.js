@@ -28,10 +28,7 @@ export const getCommentsForPost = async (postId, userId) => {
 		{
 			$lookup: {
 				from: 'likes',
-				let: {
-					commentId: '$_id',
-					userId: objectIdUserId,
-				},
+				let: { commentId: '$_id', userId: objectIdUserId },
 				pipeline: [
 					{
 						$match: {
@@ -65,7 +62,11 @@ export const getCommentsForPost = async (postId, userId) => {
 			$project: {
 				content: 1,
 				post: 1,
-				user: { _id: 1, username: 1 },
+				user: {
+					_id: 1,
+					username: 1,
+					avatar: 1,
+				},
 				createdAt: 1,
 				updatedAt: 1,
 				likeCount: 1,
@@ -79,9 +80,7 @@ export const getCommentsForPost = async (postId, userId) => {
 
 export const createComment = async (commentData, user) => {
 	if (!commentData.content) {
-		const error = new Error('Comment content is required');
-		error.statusCode = 400;
-		throw error;
+		throw new HttpError('Comment content is required', 422);
 	}
 
 	const newCommentData = {
@@ -97,16 +96,11 @@ export const createComment = async (commentData, user) => {
 export const deleteCommentById = async (commentId, user) => {
 	const comment = await Comment.findById(commentId);
 	if (!comment) {
-		const error = new Error('Comment not found');
-		error.statusCode = 404;
-		throw error;
+		throw new HttpError('Comment not found', 404);
 	}
 
-	// Check if the request user is the owner of the comment
 	if (comment.user.toString() !== user._id.toString()) {
-		const error = new Error('User not authorized to delete this comment');
-		error.statusCode = 401;
-		throw error;
+		throw new HttpError('User not authorized to delete this comment', 403);
 	}
 
 	await Comment.findByIdAndDelete(commentId);

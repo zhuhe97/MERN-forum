@@ -2,9 +2,7 @@ import { Post } from '../models/postModel.js';
 
 const validatePostData = (title, content) => {
 	if (!title || !content) {
-		const error = new Error('All fields are required: title, content');
-		error.statusCode = 400;
-		throw error;
+		throw new HttpError('All fields are required: title, content', 422);
 	}
 };
 
@@ -12,9 +10,7 @@ export const createPost = async (postData, user) => {
 	validatePostData(postData.title, postData.content);
 
 	if (!user) {
-		const error = new Error('User not authenticated');
-		error.statusCode = 403;
-		throw error;
+		throw new HttpError('User not authenticated', 401);
 	}
 
 	const newPostData = {
@@ -95,9 +91,7 @@ export const findAllPosts = async (page = 1, limit = 20) => {
 export const findPostById = async id => {
 	const post = await Post.findById(id).populate('user', 'username avatar');
 	if (!post) {
-		const error = new Error('Post not found');
-		error.statusCode = 404;
-		throw error;
+		throw new HttpError('Post not found', 404);
 	}
 	return post;
 };
@@ -105,21 +99,15 @@ export const findPostById = async id => {
 export const updatePostById = async (postId, postData, user) => {
 	const post = await Post.findById(postId);
 	if (!post) {
-		const error = new Error('Post not found');
-		error.statusCode = 404;
-		throw error;
+		throw new HttpError('Post not found', 404);
 	}
 
 	if (post.user.toString() !== user._id.toString()) {
-		const error = new Error('User not authorized');
-		error.statusCode = 401;
-		throw error;
+		throw new HttpError('User not authorized', 403);
 	}
 
 	if (!postData.title || !postData.content) {
-		const error = new Error('All fields are required');
-		error.statusCode = 400;
-		throw error;
+		throw new HttpError('All fields are required', 422);
 	}
 
 	const updatedPost = await Post.findByIdAndUpdate(postId, postData, {
@@ -131,15 +119,11 @@ export const updatePostById = async (postId, postData, user) => {
 export const deletePostById = async (postId, user) => {
 	const post = await Post.findById(postId);
 	if (!post) {
-		const error = new Error('Post not found');
-		error.statusCode = 404;
-		throw error;
+		throw new HttpError('Post not found', 404);
 	}
 
 	if (post.user.toString() !== user._id.toString()) {
-		const error = new Error('User not authorized');
-		error.statusCode = 401;
-		throw error;
+		throw new HttpError('User not authorized', 403);
 	}
 
 	await Post.findByIdAndDelete(postId);

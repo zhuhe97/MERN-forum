@@ -8,6 +8,6 @@ export const toggleLike = async (req, res) => {
 		const response = await likesService.toggleUserLike(userId, commentId);
 		res.status(200).json({ message: response });
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
