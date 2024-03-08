@@ -10,13 +10,16 @@ export const createPost = async (req, res) => {
 	}
 };
 
-export const getAllPosts = async (req, res) => {
+export const getAllPosts = async (req, res, next) => {
 	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const limit = parseInt(req.query.limit, 10) || 20;
+
 		const posts = await postService.findAllPosts();
 		res.status(200).json({ count: posts.length, data: posts });
 	} catch (error) {
 		console.log(error.message);
-		res.status(500).json({ message: error.message });
+		return next(error);
 	}
 };
 

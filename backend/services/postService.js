@@ -27,13 +27,73 @@ export const createPost = async (postData, user) => {
 	return post;
 };
 
-export const findAllPosts = async () => {
-	const posts = await Post.find({});
-	return posts;
+export const findAllPosts = async (page = 1, limit = 20) => {
+	const skip = (page - 1) * limit;
+
+	const posts = await Post.aggregate([
+		// Match all posts
+		{ $match: {} },
+		// Join with the User collection to populate the post's author
+		{
+			$lookup: {
+				from: 'users',
+				localField: 'user',
+				foreignField: '_id',
+				as: 'user',
+			},
+		},
+		// Unwind the user array to make it an object
+		{
+			$unwind: {
+				path: '$user',
+				preserveNullAndEmptyArrays: true,
+			},
+		},
+		// Join with the Comment collection
+		{
+			$lookup: {
+				from: 'comments',
+				localField: '_id',
+				foreignField: 'post',
+				as: 'comments',
+			},
+		},
+		// Add fields to calculate the number of comments and the last reply time
+		{
+			$addFields: {
+				commentsCount: { $size: '$comments' },
+				lastReplyTime: { $max: '$comments.createdAt' }, // Assuming your comments collection has a 'createdAt' field
+			},
+		},
+		// Project the desired fields
+		{
+			$project: {
+				title: 1,
+				content: 1,
+				user: { username: 1, avatar: 1 },
+				createdAt: 1,
+				updatedAt: 1,
+				commentsCount: 1,
+				lastReplyTime: 1, // Include the last reply time in the final output
+			},
+		},
+
+		{ $skip: skip },
+		{ $limit: limit },
+	]);
+
+	const totalCount = await Post.countDocuments();
+
+	return {
+		data: posts,
+		count: totalCount,
+		currentPage: page,
+		totalPages: Math.ceil(totalCount / limit),
+	};
 };
 
 export const findPostById = async id => {
-	const post = await Post.findById(id);
+	const post = await Post.findById(id).populate('user', 'username avatar');
 	if (!post) {
 		const error = new Error('Post not found');
 		error.statusCode = 404;
@@ -83,4 +143,9 @@ export const deletePostById = async (postId, user) => {
 	}
 
 	await Post.findByIdAndDelete(postId);
+};
+
+export const findPostsByUserId = async userId => {
+	const posts = await Post.find({ user: userId }).sort({ createdAt: -1 });
+	return posts;
 };
