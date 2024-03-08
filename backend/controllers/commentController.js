@@ -2,10 +2,14 @@ import * as commentService from '../services/commentService.js';
 
 export const getCommentsForPost = async (req, res, next) => {
 	try {
+		const page = parseInt(req.query.page, 10) || 1;
+		const limit = parseInt(req.query.limit, 10) || 10;
 		const userId = req.user ? req.user._id : null;
 		const comments = await commentService.getCommentsForPost(
 			req.params.postId,
-			userId
+			userId,
+			page,
+			limit
 		);
 		res.status(200).json(comments);
 	} catch (error) {

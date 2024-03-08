@@ -2,12 +2,14 @@ import { Comment } from '../models/commentModel.js';
 import mongoose from 'mongoose';
 import { Like } from '../models/likeModel.js';
 
-export const getCommentsForPost = async (postId, userId) => {
+export const getCommentsForPost = async (postId, userId, page, limit) => {
 	const objectIdPostId = new mongoose.Types.ObjectId(postId);
 	const objectIdUserId = userId ? new mongoose.Types.ObjectId(userId) : null;
-
+	const skip = (page - 1) * limit;
 	const comments = await Comment.aggregate([
 		{ $match: { post: objectIdPostId } },
+		{ $skip: skip },
+		{ $limit: limit },
 		{
 			$lookup: {
 				from: 'users',
@@ -75,7 +77,14 @@ export const getCommentsForPost = async (postId, userId) => {
 		},
 	]);
 
-	return comments;
+	const totalCount = await Comment.countDocuments({ post: objectIdPostId });
+
+	return {
+		comments,
+		totalCount,
+		page,
+		totalPages: Math.ceil(totalCount / limit),
+	};
 };
 
 export const createComment = async (commentData, user) => {
