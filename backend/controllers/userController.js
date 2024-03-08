@@ -110,3 +110,14 @@ export const getUserPosts = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const getUserProfileById = async (req, res, next) => {
+	try {
+		const userId = req.params.userId;
+		const userProfile = await userService.getUserProfileById(userId);
+		res.status(200).json(userProfile);
+	} catch (error) {
+		console.error(error.message);
+		next(error);
+	}
+};

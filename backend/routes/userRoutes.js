@@ -6,6 +6,7 @@ import {
 	getUserProfile,
 	updateUserProfile,
 	getUserPosts,
+	getUserProfileById,
 } from '../controllers/userController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 
@@ -23,5 +24,7 @@ router.patch('/profile', protect, updateUserProfile);
 // 	updateUserAvatar
 // );
 router.get('/my-posts', protect, getUserPosts);
+
+router.get('/:userId', getUserProfileById);
 
 export default router;

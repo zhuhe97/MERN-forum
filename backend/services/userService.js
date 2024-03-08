@@ -116,3 +116,11 @@ export const updateUserProfile = async ({ id, username, email, avatar }) => {
 
 // 	return user; // Return the updated user object
 // };
+
+export const getUserProfileById = async userId => {
+	const user = await User.findById(userId).select('-password -email');
+	if (!user) {
+		throw new HttpError('User not found', 404);
+	}
+	return user;
+};
