@@ -18,10 +18,18 @@ export const getCommentsForPost = async (req, res, next) => {
 	}
 };
 
-export const createComment = async (req, res, next) => {
+export const createCommentOrReply = async (req, res, next) => {
 	try {
-		const comment = await commentService.createComment(req.body, req.user);
-		res.status(201).json(comment);
+		const { content, parentCommentId } = req.body;
+		const postId = req.params.postId;
+		const userId = req.user._id;
+		const newComment = await commentService.createCommentOrReply({
+			content,
+			parentCommentId,
+			postId,
+			userId,
+		});
+		res.status(201).json(newComment);
 	} catch (error) {
 		console.error(error.message);
 		return next(error);

@@ -1,12 +1,13 @@
 import { Comment } from '../models/commentModel.js';
 import mongoose from 'mongoose';
 import { Like } from '../models/likeModel.js';
+import HttpError from '../models/errorModel.js';
 
 export const getCommentsForPost = async (postId, userId, page, limit) => {
 	const objectIdPostId = new mongoose.Types.ObjectId(postId);
 	const objectIdUserId = userId ? new mongoose.Types.ObjectId(userId) : null;
 	const skip = (page - 1) * limit;
-	const comments = await Comment.aggregate([
+	let comments = await Comment.aggregate([
 		{ $match: { post: objectIdPostId } },
 		{ $skip: skip },
 		{ $limit: limit },
@@ -61,6 +62,35 @@ export const getCommentsForPost = async (postId, userId, page, limit) => {
 			},
 		},
 		{
+			$lookup: {
+				from: 'comments',
+				localField: 'parentComment',
+				foreignField: '_id',
+				as: 'parentCommentDetails',
+			},
+		},
+		{
+			$unwind: {
+				path: '$parentCommentDetails',
+				preserveNullAndEmptyArrays: true,
+			},
+		},
+		{
+			$lookup: {
+				from: 'users',
+				localField: 'parentCommentDetails.user',
+				foreignField: '_id',
+				as: 'parentCommentUserDetails',
+			},
+		},
+		{
+			$unwind: {
+				path: '$parentCommentUserDetails',
+				preserveNullAndEmptyArrays: true,
+			},
+		},
+
+		{
 			$project: {
 				content: 1,
 				post: 1,
@@ -73,9 +103,32 @@ export const getCommentsForPost = async (postId, userId, page, limit) => {
 				updatedAt: 1,
 				likeCount: 1,
 				isLikedByCurrentUser: 1,
+				parentComment: {
+					_id: '$parentComment',
+					content: '$parentCommentDetails.content',
+					User: {
+						id: '$parentCommentUserDetails._id',
+						name: '$parentCommentUserDetails.username',
+						avatar: '$parentCommentUserDetails.avatar',
+					},
+				},
 			},
 		},
 	]);
+
+	comments = comments.map(comment => {
+		if (!comment.parentComment._id) {
+			comment.parentCommentStatus = 'NoParentEver';
+		} else if (!comment.parentComment.content) {
+			comment.parentCommentStatus = 'Deleted';
+		} else if (!comment.parentComment.User.id) {
+			comment.parentCommentStatus = 'AuthorDelete';
+		} else {
+			comment.parentCommentStatus = 'Existing';
+		}
+
+		return comment;
+	});
 
 	const totalCount = await Comment.countDocuments({ post: objectIdPostId });
 
@@ -87,19 +140,42 @@ export const getCommentsForPost = async (postId, userId, page, limit) => {
 	};
 };
 
-export const createComment = async (commentData, user) => {
-	if (!commentData.content) {
+export const createCommentOrReply = async ({
+	content,
+	parentCommentId,
+	postId,
+	userId,
+}) => {
+	if (!content) {
 		throw new HttpError('Comment content is required', 422);
 	}
 
+	let parentComment = null;
+
+	if (parentCommentId) {
+		parentComment = await Comment.findById(parentCommentId);
+		if (!parentComment) {
+			throw new HttpError('Parent comment not found', 404);
+		}
+
+		// Check if the parent comment belongs to the same post
+		if (parentComment.post.toString() !== postId) {
+			throw new HttpError(
+				'Parent comment and reply must belong to the same post',
+				400
+			);
+		}
+	}
+
 	const newCommentData = {
-		content: commentData.content,
-		post: commentData.post,
-		user: user._id,
+		content,
+		post: postId,
+		user: userId,
+		parentComment: parentCommentId,
 	};
 
-	const comment = await Comment.create(newCommentData);
-	return comment;
+	const newComment = await Comment.create(newCommentData);
+	return newComment;
 };
 
 export const deleteCommentById = async (commentId, user) => {
