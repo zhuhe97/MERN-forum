@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config.js';
 import { bucket } from '../firebaseConfig.js';
 import HttpError from '../models/errorModel.js';
+import { Follow } from '../models/followModel.js';
 
 export const createUser = async userData => {
 	const { username, email, password, password2 } = userData;
@@ -59,11 +60,19 @@ export const loginUser = async ({ email, password }) => {
 };
 
 export const getUserById = async userId => {
-	const user = await User.findById(userId).select('-password');
+	const userDocument = await User.findById(userId).select('-password');
 
-	if (!user) {
+	if (!userDocument) {
 		throw new HttpError('User not found', 404);
 	}
+
+	const user = userDocument.toObject();
+
+	const followersCount = await Follow.countDocuments({ following: userId });
+	const followingsCount = await Follow.countDocuments({ follower: userId });
+
+	user.followersCount = followersCount;
+	user.followingsCount = followingsCount;
 	return user;
 };
 
@@ -118,9 +127,17 @@ export const updateUserProfile = async ({ id, username, email, avatar }) => {
 // };
 
 export const getUserProfileById = async userId => {
-	const user = await User.findById(userId).select('-password -email');
-	if (!user) {
+	const userDocument = await User.findById(userId).select('-password -email');
+	if (!userDocument) {
 		throw new HttpError('User not found', 404);
 	}
+
+	const user = userDocument.toObject();
+
+	const followersCount = await Follow.countDocuments({ following: userId });
+	const followingsCount = await Follow.countDocuments({ follower: userId });
+
+	user.followersCount = followersCount;
+	user.followingsCount = followingsCount;
 	return user;
 };

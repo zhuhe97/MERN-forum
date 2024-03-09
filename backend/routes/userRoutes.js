@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import followRoute from './followRoute.js';
 import {
 	registerUser,
 	loginUser,
@@ -26,5 +27,7 @@ router.patch('/profile', protect, updateUserProfile);
 router.get('/my-posts', protect, getUserPosts);
 
 router.get('/:userId', getUserProfileById);
+
+router.use('/', followRoute);
 
 export default router;
