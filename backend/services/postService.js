@@ -1,4 +1,5 @@
 import { Post } from '../models/postModel.js';
+import HttpError from '../models/errorModel.js';
 
 const validatePostData = (title, content) => {
 	if (!title || !content) {
