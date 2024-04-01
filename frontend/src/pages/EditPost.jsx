@@ -13,10 +13,10 @@ const EditPost = () => {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const { enqueueSnackbar } = useSnackbar();
-	const { validateTokenAndRedirect } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	useEffect(() => {
-		if (!validateTokenAndRedirect()) {
+		if (!isAuthenticated()) {
 			return;
 		}
 		const token = localStorage.getItem('token');
@@ -24,7 +24,7 @@ const EditPost = () => {
 		setLoading(true);
 
 		axios
-			.get(`http://localhost:5555/posts/${id}`, {
+			.get(`http://localhost:5555/api/v1/posts/${id}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -43,7 +43,7 @@ const EditPost = () => {
 	}, []);
 
 	const handleEditPost = () => {
-		if (!validateTokenAndRedirect()) {
+		if (!isAuthenticated()) {
 			return;
 		}
 		const token = localStorage.getItem('token');
@@ -53,7 +53,7 @@ const EditPost = () => {
 		};
 		setLoading(true);
 		axios
-			.put(`http://localhost:5555/posts/${id}`, data, {
+			.put(`http://localhost:5555/api/v1/posts/${id}`, data, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
