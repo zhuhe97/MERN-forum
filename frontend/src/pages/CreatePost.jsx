@@ -12,10 +12,10 @@ const CreatePosts = () => {
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const { enqueueSnackbar } = useSnackbar();
-	const { validateTokenAndRedirect } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	const handleSavePost = () => {
-		if (!validateTokenAndRedirect()) {
+		if (!isAuthenticated()) {
 			return;
 		}
 
