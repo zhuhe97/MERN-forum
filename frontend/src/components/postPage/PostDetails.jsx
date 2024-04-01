@@ -1,9 +1,14 @@
-import PropTypes from 'prop-types';
+import { usePost } from '../../context/PostContext';
 
-const PostDetails = ({ post }) => {
-	const formatDate = dateString => {
-		return new Date(dateString).toLocaleString();
-	};
+const PostDetails = () => {
+	const { post } = usePost();
+
+	if (!post) {
+		console.log('post is not available yet');
+		return <div>Post not found.</div>;
+	}
+
+	const formatDate = dateString => new Date(dateString).toLocaleString();
 
 	return (
 		<article className='max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl'>
@@ -39,16 +44,6 @@ const PostDetails = ({ post }) => {
 			</div>
 		</article>
 	);
-};
-
-PostDetails.propTypes = {
-	post: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		title: PropTypes.string.isRequired,
-		content: PropTypes.string.isRequired,
-		createdAt: PropTypes.string.isRequired,
-		updatedAt: PropTypes.string.isRequired,
-	}).isRequired,
 };
 
 export default PostDetails;
