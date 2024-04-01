@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { PostProvider } from './context/PostContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import MainLayout from './components/layout/MainLayout.jsx';
 import Home from './pages/Home';
 import CreatePost from './pages/CreatePost';
 import ShowPost from './pages/ShowPost';
@@ -10,21 +11,79 @@ import EditPost from './pages/EditPost';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import ManagePosts from './components/profile/ManagePosts.jsx';
 
 const App = () => {
 	return (
 		<AuthProvider>
 			<PostProvider>
 				<Routes>
-					<Route path='/' element={<Home />} />
-					<Route path='/register' element={<Register />} />
+					<Route
+						path='/'
+						element={
+							<MainLayout>
+								<Home />
+							</MainLayout>
+						}
+					/>
+					<Route
+						path='/register'
+						element={
+							<MainLayout>
+								<Register />
+							</MainLayout>
+						}
+					/>
 					<Route path='/login' element={<Login />} />
-					<Route path='/posts/details/:id' element={<ShowPost />} />
+					<Route
+						path='/posts/details/:id'
+						element={
+							<MainLayout>
+								<ShowPost />
+							</MainLayout>
+						}
+					/>
 					<Route element={<ProtectedRoute />}>
-						<Route path='/profile' element={<Profile />} />
-						<Route path='/posts/create' element={<CreatePost />} />
-						<Route path='/posts/edit/:id' element={<EditPost />} />
-						<Route path='/posts/delete/:id' element={<DeletePost />} />
+						<Route
+							path='/profile'
+							element={
+								<MainLayout>
+									<Profile />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/view-my-posts'
+							element={
+								<MainLayout>
+									<ManagePosts />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/posts/create'
+							element={
+								<MainLayout>
+									<CreatePost />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/posts/edit/:id'
+							element={
+								<MainLayout>
+									<EditPost />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/posts/delete/:id'
+							element={
+								<MainLayout>
+									<DeletePost />
+								</MainLayout>
+							}
+						/>
 					</Route>
 				</Routes>
 			</PostProvider>
