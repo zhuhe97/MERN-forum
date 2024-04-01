@@ -4,7 +4,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useAuth } from '../utils/auth';
+import { useAuth } from '../context/AuthContext';
 
 const CreatePosts = () => {
 	const [title, setTitle] = useState('');
@@ -28,7 +28,7 @@ const CreatePosts = () => {
 		setLoading(true);
 
 		axios
-			.post('http://localhost:5555/posts', data, {
+			.post('http://localhost:5555/api/v1/posts', data, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},

@@ -4,7 +4,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useAuth } from '../utils/auth';
+import { useAuth } from '../context/AuthContext';
 
 const EditPost = () => {
 	const [title, setTitle] = useState('');
