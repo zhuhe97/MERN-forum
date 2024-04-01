@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
+	const { login } = useAuth();
 
 	const handleGoToRegister = () => {
 		navigate('/register');
@@ -17,12 +19,14 @@ const Login = ({ onLogin }) => {
 		setLoading(true);
 
 		try {
-			const response = await axios.post('http://localhost:5555/users/login', {
-				email,
-				password,
-			});
-			onLogin(response.data);
-			navigate('/');
+			const response = await axios.post(
+				'http://localhost:5555/api/v1/users/login',
+				{
+					email,
+					password,
+				}
+			);
+			login(response.data.token);
 		} catch (error) {
 			console.error('Login failed:', error);
 		} finally {
