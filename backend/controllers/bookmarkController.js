@@ -1,16 +1,13 @@
 import * as bookmarkService from '../services/bookmarkService.js';
 import HttpError from '../models/errorModel.js';
 
-export const addBookmark = async (req, res, next) => {
+export const toggleBookmark = async (req, res, next) => {
 	const userId = req.user._id;
-	const { postId } = req.body;
+	const postId = req.body.postId;
 
 	try {
-		const newBookmark = await bookmarkService.createBookmark({
-			userId,
-			postId,
-		});
-		res.status(201).json(newBookmark);
+		const result = await bookmarkService.toggleBookmark(userId, postId);
+		res.json(result);
 	} catch (error) {
 		next(error);
 	}
@@ -18,6 +15,17 @@ export const addBookmark = async (req, res, next) => {
 
 export const getBookmarksByUser = async (req, res, next) => {
 	const { userId } = req.params;
+
+	try {
+		const bookmarks = await bookmarkService.findBookmarksByUser(userId);
+		res.status(200).json(bookmarks);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getBookmarks = async (req, res, next) => {
+	const userId = req.user._id;
 
 	try {
 		const bookmarks = await bookmarkService.findBookmarksByUser(userId);

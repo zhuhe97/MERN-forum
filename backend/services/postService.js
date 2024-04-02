@@ -1,4 +1,5 @@
 import { Post } from '../models/postModel.js';
+import { Bookmark } from '../models/bookmarkModel.js';
 import HttpError from '../models/errorModel.js';
 
 const validatePostData = (title, content) => {
@@ -89,12 +90,27 @@ export const findAllPosts = async (page = 1, limit = 20) => {
 	};
 };
 
-export const findPostById = async id => {
+export const findPostById = async (id, userId = null) => {
 	const post = await Post.findById(id).populate('user', 'username avatar');
 	if (!post) {
 		throw new HttpError('Post not found', 404);
 	}
-	return post;
+
+	let isBookmark = false;
+
+	if (userId) {
+		const bookmark = await Bookmark.findOne({
+			user: userId,
+			post: id,
+		});
+		if (bookmark) {
+			isBookmark = true;
+		}
+	}
+
+	const postWithBookmark = { ...post.toObject(), isBookmark };
+
+	return postWithBookmark;
 };
 
 export const updatePostById = async (postId, postData, user) => {

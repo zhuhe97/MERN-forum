@@ -25,8 +25,12 @@ export const getAllPosts = async (req, res, next) => {
 
 export const getPostById = async (req, res, next) => {
 	try {
-		const post = await postService.findPostById(req.params.id);
-		res.status(200).json(post);
+		const userId = req.user ? req.user._id : null;
+		const postWithBookmark = await postService.findPostById(
+			req.params.id,
+			userId
+		);
+		res.status(200).json(postWithBookmark);
 	} catch (error) {
 		console.log(error.message);
 		return next(error);

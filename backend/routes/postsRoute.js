@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config.js';
 import bcrypt from 'bcryptjs';
 import commentRoutes from './commentsRoutes.js';
-import { protect } from '../middlewares/authMiddleware.js';
+import { protect, optionalAuth } from '../middlewares/authMiddleware.js';
 import {
 	createPost,
 	getAllPosts,
@@ -21,7 +21,7 @@ router.post('/', protect, createPost);
 
 router.use('/', commentRoutes);
 
-router.get('/:id', getPostById);
+router.get('/:id', optionalAuth, getPostById);
 
 router.put('/:id', protect, updatePost);
 
