@@ -1,7 +1,8 @@
 import { usePost } from '../../context/PostContext';
+import { MdBookmarkBorder, MdBookmark } from 'react-icons/md';
 
 const PostDetails = () => {
-	const { post } = usePost();
+	const { post, toggleBookmark } = usePost();
 
 	if (!post) {
 		console.log('post is not available yet');
@@ -9,11 +10,25 @@ const PostDetails = () => {
 	}
 
 	const formatDate = dateString => new Date(dateString).toLocaleString();
+	const handleToggleBookmark = () => {
+		toggleBookmark(post._id);
+	};
 
 	return (
-		<article className='max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl'>
+		<article className='max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-3xl relative'>
 			<div className='md:flex'>
 				<div className='p-8'>
+					<button
+						onClick={handleToggleBookmark}
+						className='absolute right-4 top-4 text-gray-500 hover:text-gray-700 z-10'
+						style={{ outline: 'none' }}
+					>
+						{post.isBookmark ? (
+							<MdBookmark size='24px' />
+						) : (
+							<MdBookmarkBorder size='24px' />
+						)}
+					</button>
 					<h1 className='block mt-1 text-4xl leading-tight font-extrabold text-gray-900 sm:mt-2 sm:text-5xl sm:leading-none sm:tracking-tight lg:mt-4 lg:text-6xl'>
 						{post.title}
 					</h1>

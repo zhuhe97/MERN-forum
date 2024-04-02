@@ -133,6 +133,24 @@ export const PostProvider = ({ children }) => {
 		}
 	};
 
+	const toggleBookmark = async postId => {
+		const token = localStorage.getItem('token');
+		try {
+			await axios.post(
+				`http://localhost:5555/api/v1/bookmark`,
+				{ postId: postId },
+				{ headers: { Authorization: `Bearer ${token}` } }
+			);
+			console.log('Bookmark toggled successfully');
+			setPost(prevPost => ({
+				...prevPost,
+				isBookmark: !prevPost.isBookmark,
+			}));
+		} catch (error) {
+			console.error('Error toggling bookmark:', error);
+		}
+	};
+
 	return (
 		<PostContext.Provider
 			value={{
@@ -152,6 +170,7 @@ export const PostProvider = ({ children }) => {
 				fetchComments,
 				setPostId,
 				setComments,
+				toggleBookmark,
 			}}
 		>
 			{children}
