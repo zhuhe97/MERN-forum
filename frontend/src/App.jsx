@@ -10,8 +10,9 @@ import DeletePost from './pages/DeletePost';
 import EditPost from './pages/EditPost';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Profile from './pages/Profile';
-import ManagePosts from './components/profile/ManagePosts.jsx';
+import Profile from './pages/Header/Profile.jsx';
+import ManagePosts from './pages/Header/ManagePosts.jsx';
+import Bookmarks from './pages/Header/Bookmarks.jsx';
 
 const App = () => {
 	return (
@@ -57,6 +58,14 @@ const App = () => {
 							element={
 								<MainLayout>
 									<ManagePosts />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/view-my-bookmarks'
+							element={
+								<MainLayout>
+									<Bookmarks />
 								</MainLayout>
 							}
 						/>
