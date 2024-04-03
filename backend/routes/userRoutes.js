@@ -9,7 +9,7 @@ import {
 	getUserPosts,
 	getUserProfileById,
 } from '../controllers/userController.js';
-import { protect } from '../middlewares/authMiddleware.js';
+import { protect, optionalAuth } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -26,7 +26,7 @@ router.patch('/profile', protect, updateUserProfile);
 // );
 router.get('/my-posts', protect, getUserPosts);
 
-router.get('/:userId', getUserProfileById);
+router.get('/:userId', optionalAuth, getUserProfileById);
 
 router.use('/', followRoute);
 

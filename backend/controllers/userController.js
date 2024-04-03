@@ -114,7 +114,11 @@ export const getUserPosts = async (req, res, next) => {
 export const getUserProfileById = async (req, res, next) => {
 	try {
 		const userId = req.params.userId;
-		const userProfile = await userService.getUserProfileById(userId);
+		const currentUserId = req.user ? req.user._id : null; // Get the currentUserId from req.user if logged in
+		const userProfile = await userService.getUserProfileById(
+			userId,
+			currentUserId
+		);
 		res.status(200).json(userProfile);
 	} catch (error) {
 		console.error(error.message);

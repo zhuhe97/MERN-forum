@@ -126,7 +126,7 @@ export const updateUserProfile = async ({ id, username, email, avatar }) => {
 // 	return user; // Return the updated user object
 // };
 
-export const getUserProfileById = async userId => {
+export const getUserProfileById = async (userId, currentUserId = null) => {
 	const userDocument = await User.findById(userId).select('-password -email');
 	if (!userDocument) {
 		throw new HttpError('User not found', 404);
@@ -139,5 +139,16 @@ export const getUserProfileById = async userId => {
 
 	user.followersCount = followersCount;
 	user.followingsCount = followingsCount;
+
+	// If the currentUserId is available (meaning the request is authenticated), check the follow status
+	if (currentUserId) {
+		const isFollowing = await Follow.exists({
+			follower: currentUserId,
+			following: userId,
+		});
+		user.isFollowing = !!isFollowing; // Convert to boolean
+	} else {
+		user.isFollowing = false; // Default to false if user is not logged in
+	}
 	return user;
 };
