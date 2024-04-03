@@ -43,7 +43,7 @@ const Header = () => {
 						{dropdownOpen && (
 							<div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-gray-800'>
 								<Link
-									to='/profile'
+									to='/my-profile'
 									className='block px-4 py-2 text-sm hover:bg-sea-green-100 hover:text-sea-green-700 transition-colors duration-200'
 								>
 									Profile <MdAccountCircle className='inline ml-1' />
