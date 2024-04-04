@@ -50,11 +50,9 @@ export const loginUser = async ({ email, password }) => {
 		throw new HttpError('Invalid email or password', 401); // 401 for invalid credentials
 	}
 
-	const token = jwt.sign(
-		{ id: user._id, username: user.username },
-		JWT_SECRET,
-		{ expiresIn: '1h' }
-	);
+	const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+		expiresIn: '1h',
+	});
 
 	return { user, token };
 };
