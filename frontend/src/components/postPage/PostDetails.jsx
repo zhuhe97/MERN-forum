@@ -1,5 +1,6 @@
 import { usePost } from '../../context/PostContext';
 import { MdBookmarkBorder, MdBookmark } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
 const PostDetails = () => {
 	const { post, toggleBookmark } = usePost();
@@ -34,13 +35,15 @@ const PostDetails = () => {
 					</h1>
 					<div className='mt-2 text-gray-500'>
 						<div className='flex items-center mt-2'>
-							{/* <img
-								className='w-10 h-10 rounded-full mr-4'
-								src={author.avatar}
-								alt={`${author.name} avatar`}
-							/> */}
+							<Link to={`/profile/${post.user._id}`}>
+								<img
+									className='w-10 h-10 rounded-full mr-4'
+									src={post.user.avatar}
+									alt={`${post.user.username} avatar`}
+								/>
+							</Link>
 							<div className='text-base leading-6 font-medium space-y-1'>
-								{/* <h3 className='text-gray-900'>{author.name}</h3> */}
+								<h3 className='text-gray-900'>{post.user.username}</h3>
 								<p className='text-gray-400 text-sm'>
 									Created at: {formatDate(post.createdAt)}{' '}
 									{post.createdAt !== post.updatedAt && (
