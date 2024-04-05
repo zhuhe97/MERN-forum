@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -8,22 +9,45 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
 	const [currentUser, setCurrentUser] = useState(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		console.log('Checking authentication status...');
 		const token = localStorage.getItem('token');
 		if (token && !isTokenExpired(token)) {
-			console.log('Token found and valid:', token);
-			setCurrentUser(jwtDecode(token));
+			fetchUserProfile(token);
 		} else {
-			console.log('No valid token found. User is not authenticated.');
 			setCurrentUser(null);
 		}
 	}, []);
 
+	const fetchUserProfile = async token => {
+		try {
+			const response = await axios.get(
+				'http://localhost:5555/api/v1/users/profile',
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			const decodedToken = jwtDecode(token);
+			setCurrentUser({ ...decodedToken, ...response.data });
+		} catch (error) {
+			console.error('Error fetching user profile:', error);
+			setCurrentUser(null);
+		}
+	};
+
+	const login = async newToken => {
+		localStorage.setItem('token', newToken);
+		await fetchUserProfile(newToken);
+		navigate('/');
+	};
+
 	const logout = () => {
 		localStorage.removeItem('token');
 		setCurrentUser(null);
+		navigate('/login');
 	};
 
 	const isTokenExpired = token => {
@@ -35,35 +59,24 @@ export const AuthProvider = ({ children }) => {
 		}
 	};
 
-	const isTokenValid = () => {
-		const token = localStorage.getItem('token');
-		return token && !isTokenExpired(token);
-	};
-
 	const updateProfile = async userData => {
-		const token = localStorage.getItem('token');
-		try {
-			const response = await axios.put(
-				'http://localhost:5555/users/profile',
-				userData,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
-			setCurrentUser(response.data); // Update authUser state with new profile data
-			console.log('Profile updated successfully');
-		} catch (error) {
-			console.error('Error updating profile:', error);
-		}
+		const response = await axios.patch(
+			'http://localhost:5555/api/v1/users/profile',
+			userData,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}
+		);
+		setCurrentUser(response.data);
 	};
 
-	const value = {
-		currentUser,
-		logout,
-		updateProfile,
+	const isAuthenticated = () => {
+		return !!currentUser;
 	};
+
+	const value = { currentUser, login, logout, updateProfile, isAuthenticated };
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
