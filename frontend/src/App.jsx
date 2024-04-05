@@ -10,9 +10,11 @@ import DeletePost from './pages/DeletePost';
 import EditPost from './pages/EditPost';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Profile from './pages/Header/Profile.jsx';
+import MyProfile from './pages/Header/MyProfile.jsx';
 import ManagePosts from './pages/Header/ManagePosts.jsx';
 import Bookmarks from './pages/Header/Bookmarks.jsx';
+import Connections from './pages/Header/Connections.jsx';
+import UserProfile from './pages/UserProfile.jsx';
 
 const App = () => {
 	return (
@@ -46,10 +48,10 @@ const App = () => {
 					/>
 					<Route element={<ProtectedRoute />}>
 						<Route
-							path='/profile'
+							path='/my-profile'
 							element={
 								<MainLayout>
-									<Profile />
+									<MyProfile />
 								</MainLayout>
 							}
 						/>
@@ -66,6 +68,22 @@ const App = () => {
 							element={
 								<MainLayout>
 									<Bookmarks />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/Networks'
+							element={
+								<MainLayout>
+									<Connections />
+								</MainLayout>
+							}
+						/>
+						<Route
+							path='/profile/:userId'
+							element={
+								<MainLayout>
+									<UserProfile />
 								</MainLayout>
 							}
 						/>
