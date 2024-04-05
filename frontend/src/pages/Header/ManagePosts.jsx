@@ -60,7 +60,7 @@ const ManagePosts = () => {
 		return <Spinner />;
 	}
 	return (
-		<div className='max-w-3xl mx-auto px-4 bg-white shadow rounded-lg p-6'>
+		<div className='max-w-3xl mt-8 mx-auto px-4 bg-white shadow rounded-lg p-6'>
 			<h2 className='text-2xl font-semibold mb-4'>Manage Posts</h2>
 			{posts.map(post => (
 				<div
@@ -72,6 +72,7 @@ const ManagePosts = () => {
 						onClick={() => navigate(`/posts/details/${post._id}`)}
 					>
 						{post.title}
+						<p className='text-gray-500 text-sm truncate'>{post.content}</p>
 					</button>
 					<div>
 						<button
