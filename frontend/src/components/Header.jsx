@@ -11,7 +11,7 @@ import {
 
 const Header = () => {
 	const navigate = useNavigate();
-	const { isAuthenticated, logout } = useAuth();
+	const { isAuthenticated, logout, currentUser } = useAuth();
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 
 	const handleLogout = () => {
@@ -34,11 +34,13 @@ const Header = () => {
 							className='cursor-pointer flex items-center'
 						>
 							<img
-								src={'https://via.placeholder.com/40'}
-								alt='User Avatar'
+								src={currentUser.avatar}
+								alt={'https://via.placeholder.com/40'}
 								className='w-10 h-10 rounded-full border-2 border-white mr-2'
 							/>
-							<MdAccountCircle className='text-2xl' />
+							<span className='text-xs text-gray-200'>
+								{currentUser.username}
+							</span>
 						</div>
 						{dropdownOpen && (
 							<div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-gray-800'>
