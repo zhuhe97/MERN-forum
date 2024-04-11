@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRouter from './apiRouter.js';
 import { PORT, mongoDBURL } from './config.js';
-import { admin, bucket } from './firebaseConfig.js';
+// import { admin, bucket } from './firebaseConfig.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 
 dotenv.config();

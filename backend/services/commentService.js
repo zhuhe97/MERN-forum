@@ -1,7 +1,11 @@
 import { Comment } from '../models/commentModel.js';
+import { Post } from '../models/postModel.js';
 import mongoose from 'mongoose';
 import { Like } from '../models/likeModel.js';
 import HttpError from '../models/errorModel.js';
+import { initializeApp } from 'firebase-admin/app';
+import { admin, db } from '../firebaseConfig.js';
+import { User } from '../models/userModel.js';
 
 export const getCommentsForPost = async (postId, userId, page, limit) => {
 	const objectIdPostId = new mongoose.Types.ObjectId(postId);
@@ -174,7 +178,34 @@ export const createCommentOrReply = async ({
 		parentComment: parentCommentId,
 	};
 
+	const user = await User.findById(userId).select('username');
+	const userName = user.username;
+
 	const newComment = await Comment.create(newCommentData);
+
+	// After successfully creating the comment, create a notification
+	try {
+		const post = await Post.findById(postId).populate('user');
+		const postOwnerId = post.user._id.toString();
+
+		// Only create a notification if the commenter is not the post owner
+		if (postOwnerId !== userId.toString()) {
+			await db.collection('notifications').add({
+				receiverId: postOwnerId,
+				senderId: userId.toString(),
+				type: 'new-comment',
+				content: content.toString(),
+				postId: postId.toString(),
+				commentId: newComment._id.toString(),
+				createdByUsername: userName.toString(),
+				read: false,
+				createdAt: admin.firestore.FieldValue.serverTimestamp(),
+			});
+		}
+	} catch (error) {
+		console.error('Failed to create notification', error);
+	}
+
 	return newComment;
 };
 

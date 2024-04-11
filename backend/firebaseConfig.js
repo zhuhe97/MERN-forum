@@ -1,11 +1,13 @@
 import admin from 'firebase-admin';
-import serviceAccount from './forum-jenna-firebase-adminsdk-em14u-156edbb8f1.json' assert { type: 'json' };
+import serviceAccount from './forum-lucy-firebase-adminsdk-x4arr-1e076ecc8d.json' assert { type: 'json' };
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
-	storageBucket: 'gs://forum-jenna.appspot.com',
+	// storageBucket: 'gs://forum-jenna.appspot.com',
 });
 
-const bucket = admin.storage().bucket();
+// const bucket = admin.storage().bucket();
 
-export { admin, bucket };
+const db = admin.firestore();
+
+export { admin, db };

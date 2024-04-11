@@ -2,7 +2,7 @@ import { User } from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config.js';
-import { bucket } from '../firebaseConfig.js';
+// import { bucket } from '../firebaseConfig.js';
 import HttpError from '../models/errorModel.js';
 import { Follow } from '../models/followModel.js';
 
