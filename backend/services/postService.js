@@ -60,10 +60,10 @@ export const findAllPosts = async (page = 1, limit = 20) => {
 		{
 			$addFields: {
 				commentsCount: { $size: '$comments' },
-				lastReplyTime: { $max: '$comments.createdAt' }, // Assuming your comments collection has a 'createdAt' field
+				lastReplyTime: { $max: '$comments.createdAt' },
+				field,
 			},
 		},
-		// Project the desired fields
 		{
 			$project: {
 				title: 1,
@@ -72,7 +72,7 @@ export const findAllPosts = async (page = 1, limit = 20) => {
 				createdAt: 1,
 				updatedAt: 1,
 				commentsCount: 1,
-				lastReplyTime: 1, // Include the last reply time in the final output
+				lastReplyTime: 1,
 			},
 		},
 

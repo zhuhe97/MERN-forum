@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
 			// Verify token
 			const decoded = jwt.verify(token, JWT_SECRET);
 			console.log('.....decoded', decoded);
-			// Get user from the token (you might want to exclude the password when fetching user)
+			// Get user from the token , exclude the password when fetching user
 			req.user = await User.findById(decoded.id).select('-password');
 
 			next();
